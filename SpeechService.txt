@@ -1,0 +1,4 @@
+RECOGNIZED: Text=Si llegas a crear una web exitosa, eventualmente tus clientes te dirán para cuando la aplicación de escritorio o la aplicación móvil. 
+Esto para un equipo de desarrollo pequeño es más trabajo y en muchos casos no es tan esencial como aparenta. 
+Así que en lugar de querer otras aplicaciones y permitirle a tus usuarios tener algo muy similar a las aplicaciones nativas, puedes optar por las progressive Web si estas no son una herramienta ni una tecnología, sino una forma de cómo añadir más funcionalidad de forma progresiva a tu aplicación web. 
+Es decir, tu web inicia pequeña, luego puedes permitir al usuario añadirle un icono de acceso rápido a tu aplicación.
