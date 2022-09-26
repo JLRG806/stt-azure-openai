@@ -18,6 +18,7 @@ async function fromFile() {
     let speechRecognizer = new sdk.SpeechRecognizer(speechConfig, audioConfig);
     let res = { text: "", error: false, errorMessage: "" };
 
+    console.log(audioConfig);
     speechRecognizer.recognizeOnceAsync(result => {
         switch (result.reason) {
             case sdk.ResultReason.RecognizedSpeech:
@@ -45,9 +46,16 @@ async function fromFile() {
                 }
                 break;
         }
+
+        if (res.error !== true) {
+            const response = sendPrompt(res.text);
+            console.log(response);
+            return response;
+
+        }
         speechRecognizer.close();
     });
-    return res;
+
 }
 
 
@@ -67,8 +75,8 @@ async function sendPrompt(text) {
 }
 
 async function main() {
-    //const stt = await fromFile();
-    //console.log(stt);
+    const stt = await fromFile();
+    console.log(stt);
     let text = "¿Apellidos y nombres?" +
         "Jose Jesus Rodriguez Ramos" +
         "¿Su edad ?" +
@@ -89,8 +97,9 @@ async function main() {
         "        Si, una vez por mes" +
         "¿Tiene dificultad para oír ?" +
         "        No";
-    const response = await sendPrompt(text);
-    console.log(response);
+
+    //const response = await sendPrompt(stt);
+    //console.log(response);
 }
 
 main();
