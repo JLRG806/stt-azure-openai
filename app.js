@@ -18,6 +18,23 @@ const openai = new OpenAIApi(configuration);
 
 var recognized = "";
 var formatted = "";
+var obj = {};
+
+// Create a function that converts csv to json, the csv have 2 columns, questions and answer
+function csvJSON(csv) {
+    var lines = csv.split(" , ");
+    var result = [];
+    var headers = lines[0].split(" , ");
+    for (var i = 1; i < lines.length; i++) {
+        var obj = {};
+        var currentline = lines[i].split(" , ");
+        for (var j = 0; j < headers.length; j++) {
+            obj[headers[j]] = currentline[j];
+        }
+        result.push(obj);
+    }
+    return result; //JSON
+}
 
 recognizer.recognizing = (s, e) => {
     //console.log(`RECOGNIZING: Text=${e.result.text}`);
@@ -26,7 +43,7 @@ recognizer.recognizing = (s, e) => {
 recognizer.recognized = (s, e) => {
     if (e.result.reason == sdk.ResultReason.RecognizedSpeech) {
         console.log(`RECOGNIZED: Text=${e.result.text}`);
-        recognized += e.result.text + " . ";
+        recognized += e.result.text + "   ";
     }
     else if (e.result.reason == sdk.ResultReason.NoMatch) {
         console.log("NOMATCH: Speech could not be recognized.");
@@ -40,11 +57,16 @@ recognizer.canceled = (s, e) => {
         //Call function to send prompt to OpenAI
         sendPrompt(recognized).then((response) => {
             console.log(response);
-            formatted = JSON.parse(response);
+            formatted = response;
             console.log(formatted);
+            return formatted;
+        }).then((response) => {
+            //Call function to convert csv to json
+            obj = csvJSON(response);
+            console.log(obj);
         });
-
         console.log("TEST FORMATTED" + formatted);
+
     }
 
     if (e.reason == sdk.CancellationReason.Error) {
@@ -67,18 +89,17 @@ recognizer.startContinuousRecognitionAsync();
 
 async function sendPrompt(text) {
 
-    const prompt = "Construye en formato JSON con pregunta como question y respuesta como answer, del siguiente texto: \n\n" + text;
+    const prompt = "Corrige ortograficamente el texto y crea en formato CSV separado por coma las columnas questions y answer, elimina el texto que no se considere pregunta y respuesta y añade cada pregunta en la columna question y su respuesta a las columna answer del siguiente texto: \n\n" + text;
     try {
         const completion = await openai.createCompletion({
             model: "text-davinci-002",
             prompt: prompt,
             temperature: 0,
-            max_tokens: 256,
+            max_tokens: 200,
             top_p: 1.0,
             frequency_penalty: 0.0,
             presence_penalty: 0.0,
         });
-        console.log(completion.data.choices[0].text);
         return completion.data.choices[0].text;
     } catch (error) {
         if (error.response) {
